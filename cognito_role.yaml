@@ -32,10 +32,6 @@ Resources:
       UserPoolName: !Ref UserPoolName
       MfaConfiguration: "OFF"
       Schema:
-        - Name: name
-          AttributeDataType: String
-          Mutable: true
-          Required: true
         - Name: email
           AttributeDataType: String
           Mutable: false
