@@ -1,0 +1,97 @@
+# This sample, non-production-ready template describes a AWS Cognito.
+# (c) 2022 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.  
+# This AWS Content is provided subject to the terms of the AWS Customer Agreement available at  
+# http://aws.amazon.com/agreement or other written agreement between Customer and either
+# Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Creation of the auth layer
+
+Parameters:  
+    UserPoolName:
+        Description: Put the name for the user pool.
+        Type: String
+        Default: WildRydes  
+    UserPoolClientAppName:
+        Description: Put the name for the user pool client app.
+        Type: String
+        Default: WildRydesWebApp
+    LambdaRoleName:
+        Description: Put the name for lambda role.
+        Type: String
+        Default: WildRydesLambda  
+
+Resources:
+  
+  # ===========================
+  # COGNITO USER POOL
+  # ===========================
+  CognitoUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      MfaConfiguration: "OFF"
+      Schema:
+        - Name: name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: email
+          AttributeDataType: String
+          Mutable: false
+          Required: true
+  
+  # ===========================
+  # COGNITO APP CLIENT
+  # ===========================
+  CognitoUserPoolAppClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties: 
+        ClientName: !Ref UserPoolClientAppName
+        GenerateSecret: False
+        PreventUserExistenceErrors: ENABLED
+        UserPoolId: !Ref CognitoUserPool
+
+  # ===========================
+  # LAMBDA IAM ROLE
+  # ===========================
+  RoleLambdaDynamo: 
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Ref LambdaRoleName
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+      Path: "/" 
+
+Outputs:
+  CognitoUserPoolId:
+    Description: >
+      ID for the CognitoUserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolId'
+    Value: !Ref CognitoUserPool
+
+  CognitoUserPoolAppClientId:
+    Description: >
+      ID for the CognitoUserPool App Client
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolAppClientId'
+    Value: !Ref CognitoUserPoolAppClient
+
+  RoleLambdaDynamoArn:
+    Description: >
+      Arn for the RoleLambdaDynamo
+    Export:
+      Name: !Sub '${AWS::StackName}-RoleLambdaDynamoArn'
+    Value: !GetAtt 'RoleLambdaDynamo.Arn'
