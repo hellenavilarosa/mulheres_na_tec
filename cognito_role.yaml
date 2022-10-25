@@ -1,3 +1,4 @@
+
 # This sample, non-production-ready template describes a AWS Cognito.
 # (c) 2022 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.  
 # This AWS Content is provided subject to the terms of the AWS Customer Agreement available at  
@@ -6,7 +7,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
     Creation of the auth layer
-
 Parameters:  
     UserPoolName:
         Description: Put the name for the user pool.
@@ -91,3 +91,4 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-RoleLambdaDynamoArn'
     Value: !GetAtt 'RoleLambdaDynamo.Arn'
+
